@@ -45,8 +45,8 @@
 			     		{id: 'Opbutton', src: "img/OPButton.png"},
 			     		{id: 'tire', src: "img/tire.png"},
 			    		{id: 'topgreen', src: "img/TopGreen.jpg"},
-						{id: 'skid_on_ice', src: "sound/skid_on_ice.wave"},
-						{id: 'bgSound', src: "sound/bgSound.mp3"},
+						{id: 'ansClick', src: "sound/ansClick.wav"},
+						{id: 'bgSound', src: "sound/bgSound.mp3"}
 					]
 		}
 
@@ -189,7 +189,6 @@
 				poptions.addChild(opbtn1,opbtn2, opbtn3, opbtn4);
 				gameScreen.addChild(poptions);
 			});
-			createjs.Sound.play("skid_on_ice");
 		}
 
 		function getOPbutton(id, label){
@@ -205,6 +204,7 @@
 			opContainer.addChild(opbutton, btnLabel);
 			opContainer.addEventListener("click", function(evt){
 				console.log("clicked" + evt);
+				createjs.Sound.play("ansClick");
 				var resource = game.puzzles;
 				var Q = resource[game.currentQ];
 				if( Q.ans == evt.currentTarget.id ){
