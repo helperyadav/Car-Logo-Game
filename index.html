@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Game</title>
+        <style>/* Removes Mobile Highlight */ *{-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}</style>
+        <script src="https://code.createjs.com/createjs-2014.12.12.min.js"></script>
+        <script src="lib/GlowFilter.js"></script>
+    
+	<style>
+		#Stage {
+			  margin-left: auto;
+			  margin-right: auto;
+			  display: block;
+			  background-color:black;
+		}
+	</style>
+	</head>
+    <body onload="init()">
+		<input type='button' value='Start' onclick='handleFileloadEvent()'/><br/>
+        <canvas id="Stage" width="600" height="400" style="border:1px solid black;"></canvas>
+		
+    <script>
+		var tkr = {};
+		var stage;
+		var splashScreen, gameScreen, poptions;
+		var canvasSize = {w:600, h:400};
+		var preload, puzzleQueue;
+		var degug = true;
+		var game = {
+			score: 0,
+			currentQ: -1,
+			puzzles:[
+   					    {id: "myImage1", src:"img/bmw.png", op1: 'BMW', op2: 'AUDI', op3:'TOYOTA', op4:'TATA', ans:'op1' },
+			     		{id: "myImage2", src:"img/audi.png", op1: 'BMW', op2: 'nividia', op3:'TOYOTA', op4:'Audi', ans:'op4'},
+			     		{id: "myImage3", src:"img/mercedes.png", op1: 'BMW', op2: 'AUDI', op3:'Mercedes', op4:'TATA', ans:'op3'},
+						{id: "myImage4", src:"img/Jaguar.png", op1: 'Jaguar', op2: 'AUDI', op3:'Mercedes', op4:'TATA', ans:'op1'},
+			     		{id: "Renault", src:"img/Renault.png", op1: 'Renault', op2: 'AUDI', op3:'Mercedes', op4:'TATA', ans:'op1'},
+						{id: "farrari", src:"img/farrari1.png", op1: 'Renault', op2: 'AUDI', op3:'Mercedes', op4:'farrari', ans:'op4'}
+					],
+			resources: [
+						{id: "startbtn", src:"img/start.png"},
+			     		{id:'Road', src:"img/Road.jpg"},
+			     		{id: 'menuBar', src: "img/MenuBar.jpg"},
+			     		{id: 'car', src: "img/car1.png"},
+			     		{id: 'Opbutton', src: "img/OPButton.png"},
+			     		{id: 'tire', src: "img/tire.png"},
+			    		{id: 'topgreen', src: "img/TopGreen.jpg"},
+						{id: 'skid_on_ice', src: "sound/skid_on_ice.wave"},
+						{id: 'bgSound', src: "sound/bgSound.mp3"},
+					]
+		}
+
+		function init() {
+			stage = new createjs.Stage('Stage');
+			stage.enableMouseOver();
+			
+			//screen shown on game load.
+			splashScreen = new createjs.Container();
+			gameScreen = new createjs.Container();
+			stage.addChild(splashScreen);
+			
+			var text = new createjs.Text("Loading...", "20px Arial", "#00ff00");
+			text.x = Math.round( (canvasSize.w / 2 )- (text.getBounds().width/2) );
+			text.y = 10 + text.getBounds().height;
+			text.textBaseline = "alphabetic";
+			splashScreen.addChild(text);
+
+			preload = new createjs.LoadQueue();
+			preload.installPlugin(createjs.Sound);
+			preload.loadManifest(game.resources);
+			preload.addEventListener("fileload", function(event){
+				handleFileloadEvent(event);
+			});
+			
+			preload.addEventListener("complete", function(){
+				console.log('all loaded');
+				//start loading puzzles.
+				puzzleQueue =  new createjs.LoadQueue();
+				puzzleQueue.loadManifest(game.puzzles);
+				puzzleQueue.addEventListener("fileload", function(event){
+					handleFileloadEvent(event);
+				});
+				puzzleQueue.addEventListener("complete", function(){
+					handleAllFileComplete();
+				});
+				
+			});
+			
+			createjs.Ticker.addEventListener("tick", gameLoop)
+		}
+		
+		function handleFileloadEvent(event){
+			if (typeof text != 'undefined'){
+				splashScreen.removeChild( text );
+			}
+			
+			text = new createjs.Text("Loaded " + event.item.id + " " + event.item.type, "10px Arial", "#00ff00");
+			text.x = Math.round( (canvasSize.w / 2 ) - (text.getBounds().width/2) );
+			text.y = 40 + text.getBounds().height;
+			text.textBaseline = "alphabetic";
+			splashScreen.addChild(text);
+			console.log( event.item.src );
+		}
+		
+		function handleAllFileComplete(){
+			console.log('All resource loaded.');
+
+			var startbtn = preload.getResult('startbtn');
+			var btn = new createjs.Bitmap(startbtn);
+			btn.x = (canvasSize.w/2) - btn.getBounds().width;
+			btn.y = (canvasSize.h/2) - btn.getBounds().height;
+			
+			btn.addEventListener('click', function(){
+				stage.removeChild(btn);
+				StartGame();
+			})
+			stage.removeChild(splashScreen);
+			stage.addChild(btn);
+		}
+	
+		function gameLoop(){
+			stage.update();
+		}
+
+		function StartGame(){
+			createjs.Sound.play("bgSound", 'none',0, 0, 1);
+			var strScore = "Score: " + game.score ;
+			var score = new createjs.Text(strScore, "20px Arial", "#00ff00");
+			score.x = Math.round( (canvasSize.w ) - (score.getBounds().width) ) - 30;
+			score.y = 10 + score.getBounds().height;
+			score.textBaseline = "alphabetic";
+
+			var Road = new createjs.Bitmap(preload.getResult('Road'));
+			Road.x = 0; Road.y = 50;
+
+			var topgreen = new createjs.Bitmap(preload.getResult('topgreen'));
+			topgreen.x = 0; topgreen.y = 0;
+			
+			var tire = new createjs.Bitmap(preload.getResult('tire'));
+			tire.x = 285; tire.y = 355;
+			tire.regX = 50; tire.regY = 50;
+			createjs.Tween.get(tire).to({rotation:720},2000,createjs.Ease.cubicOut).call(function(t){
+			});
+
+			gameScreen.addChild(score, Road, tire);
+			stage.addChild( gameScreen);
+			console.log('Game staring...');
+			LoadNext();
+		}
+
+		function LoadNext(){
+			var p = ++game.currentQ;
+			var puzzle = game.puzzles[p];
+			
+			
+			
+			pContainer = new createjs.Container();
+			poptions = new createjs.Container();
+			var car = new createjs.Bitmap(preload.getResult('car'));
+			car.x = 0 ;	car.y = 0;
+
+			var pimg = new createjs.Bitmap(puzzleQueue.getResult(puzzle.id));
+			pimg.x = 76;	pimg.y = 36;
+
+			pContainer.addChild(car, pimg);
+			pContainer.x = 0;
+			pContainer.y = 100;
+
+			gameScreen.addChild(pContainer);
+			
+			
+			createjs.Tween.get(pContainer).to({x:200},1000,createjs.Ease.cubicOut).call(function(t){
+				var opbtn1 = getOPbutton('op1' , puzzle.op1);
+				opbtn1.x = 10;
+				opbtn1.y = 310;
+
+				var opbtn2 = getOPbutton('op2' , puzzle.op2);
+				opbtn2.x = 10;
+				opbtn2.y = 310 + opbtn2.getBounds().height + 5;
+
+				var opbtn3 = getOPbutton('op3' ,puzzle.op3);
+				opbtn3.x = gameScreen.getBounds().width - (10 + opbtn1.getBounds().width + 10 );
+				opbtn3.y = 310;
+
+				var opbtn4 = getOPbutton('op4' ,puzzle.op4);
+				opbtn4.x = gameScreen.getBounds().width - (10 + opbtn1.getBounds().width + 10);
+				opbtn4.y = 310  + opbtn2.getBounds().height + 5;
+				
+				poptions.addChild(opbtn1,opbtn2, opbtn3, opbtn4);
+				gameScreen.addChild(poptions);
+			});
+			createjs.Sound.play("skid_on_ice");
+		}
+
+		function getOPbutton(id, label){
+			var opContainer = new createjs.Container();
+			var opbutton = new createjs.Bitmap(preload.getResult('Opbutton'));
+			var btnLabel = new createjs.Text(label, "20px Arial", "#003200");
+			
+			btnLabel.x = 40; btnLabel.outline = 2;
+			btnLabel.y = 10;
+			
+			opContainer.name = id;
+			opContainer.id = id;
+			opContainer.addChild(opbutton, btnLabel);
+			opContainer.addEventListener("click", function(evt){
+				console.log("clicked" + evt);
+				var resource = game.puzzles;
+				var Q = resource[game.currentQ];
+				if( Q.ans == evt.currentTarget.id ){
+					console.log('load next');
+					if (typeof pContainer != 'undefined'){
+						var oldCar = pContainer;
+						createjs.Tween.get(oldCar).to({x:600},1000,createjs.Ease.cubicOut).call(function(t){
+							gameScreen.removeChild( oldCar );
+							LoadNext();
+						});
+					}
+					
+					if (typeof poptions != 'undefined'){
+						poptions.removeAllChildren();
+					}
+				}
+			});
+
+			opContainer.addEventListener("mouseover", function(event){
+				event.target.cursor = 'pointer'; 
+			});
+
+			opContainer.addEventListener("mouseout", function(event){
+				event.target.cursor = ''; 
+			});
+
+			return opContainer;
+		}
+
+		function drawGrid(){
+			if(degug==true){
+				var line = new createjs.Shape();
+				for(var i = 0; i < canvasSize.w; i+=10){
+					line.graphics
+						.setStrokeStyle(0.4,"round")
+						.beginStroke("#AA0000")
+						.moveTo(i,0)
+						.lineTo(i, canvasSize.h);
+					
+					line.graphics
+						.setStrokeStyle(0.4,"round")
+						.beginStroke("#AA0000")
+						.moveTo(0, i)
+						.lineTo(canvasSize.w, i);
+				}
+				
+				
+				//line.graphics.beginStroke("DeepSkyBlue").moveTo(20,20).lineTo(40, 40);
+				stage.addChild(line);
+			}
+		}
+	</script>
+	</body>
+	
+</html>
