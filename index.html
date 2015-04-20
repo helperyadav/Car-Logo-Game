@@ -67,7 +67,6 @@
                 "http://localhost/mywebs/Puzzle-Game/GetPuzzles.php?test=123&test2=124&dsf=2321",
                 { User: "test", Lavel: 'Easy' },
                 function (data) {
-                    alert('page content: ' + data);
                     game.puzzles = $.parseJSON(data);
                 }
             );
