@@ -64,11 +64,19 @@
 		    // Get puzzle lists from server and populate puzzle data base. 
 		    /********  NOTE: Remove this get request if you don't want to run Apache server on your machine. ***/
 			$.get(
-                "http://localhost/mywebs/Puzzle-Game/GetPuzzles.php?test=123&test2=124&dsf=2321",
+                "/bsy/carlogo1/GetPuzzles.php?test=123&test2=124&dsf=2321",
                 { User: "test", Lavel: 'Easy' },
                 function (data) {
                     game.puzzles = $.parseJSON(data);
-                }
+					puzzleQueue =  new createjs.LoadQueue();
+					puzzleQueue.loadManifest(game.puzzles);
+					puzzleQueue.addEventListener("fileload", function(event){
+						handleFileloadEvent(event);
+					});
+					puzzleQueue.addEventListener("complete", function(){
+						handleAllFileComplete();
+					});
+				}
             );
 
 
@@ -88,14 +96,7 @@
 			preload.addEventListener("complete", function(){
 				console.log('all loaded');
 				//start loading puzzles.
-				puzzleQueue =  new createjs.LoadQueue();
-				puzzleQueue.loadManifest(game.puzzles);
-				puzzleQueue.addEventListener("fileload", function(event){
-					handleFileloadEvent(event);
-				});
-				puzzleQueue.addEventListener("complete", function(){
-					handleAllFileComplete();
-				});
+				
 				
 			});
 			
