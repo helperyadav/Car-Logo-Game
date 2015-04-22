@@ -1,21 +1,26 @@
 <?php
-include_once("Puzzle.php");
+include_once("PuzzleProvider.php");
+include_once ("DBrepository.php");
 
-	$response = "";
-	$data = "";
+$response = "";
+$data = "";
 switch($_SERVER['REQUEST_METHOD'])
 {
 	case 'GET': 
 		$the_request = &$_GET; 
-		//echo "this is a GET  request"; 
-		//$data = new Puzzle(); 
-		echo json_encode(GetPuzzles());
+		
+		echo json_encode(GetPuzzleProvider(1)->GetPuzzles());
+
 		break;
 	case 'POST': 
 		$the_request = &$_POST; 
 		//echo "this is a POST  request"; 
 		break;
-	case 'PUT': $the_request = &$_POST; echo "this is a PUT  request"; break;
+	case 'PUT': 
+		$the_request = &$_PUT; 
+		echo "this is a PUT  request"; 
+		
+		break;
 	case 'DELETE': $the_request = &$_DELETE; echo "this is a DELETE  request"; break;
 	
 	default: echo "<br> This method is not supported yet";
