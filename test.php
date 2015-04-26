@@ -1,6 +1,6 @@
 <?php
 	var_dump($_GET);
-	echo "<br>";
+	
 	
 switch($_SERVER['REQUEST_METHOD'])
 {
@@ -11,13 +11,15 @@ switch($_SERVER['REQUEST_METHOD'])
 	
 	default: echo "<br> This method is not supported yet";
 }
-echo "<br> i am writing this <br>";
+echo " i am writing this";
 
+/*
 echo("<p><table><th>KEY</th><th>VALUE</th>");
 foreach($_GET as $key=>$value)
 {
 	echo("<tr><td>$key</td><td>$value</td></tr>");
 }
-echo("</table></p>\r\n");
+echo("<"/table></p>\r\n");
+*/
 
 ?>

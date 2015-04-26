@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+    <title>My Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body >
+	<script>
+	
+Person = {
+	CurrentPuzzleIndex	: -1,
+	Bank: {}
+};
+Bank = {
+	name : '',
+}
+
+var Person = function (firstName) {
+  this.firstName = firstName;
+  console.log('Person instantiated');
+};
+
+Person.prototype.sayHello = function() {
+  console.log("Hello, I'm " + this.firstName);
+};
+
+var person1 = new Person("Alice");
+var person2 = new Person("Bob");
+
+// call the Person sayHello method.
+person1.sayHello(); // logs "Hello, I'm Alice"
+person2.sayHello(); // logs "Hello, I'm Bob"
+
+
+	</script>
+
+
+</body>
+</html>

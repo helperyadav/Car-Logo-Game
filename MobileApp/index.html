@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+<head>
+    <title>My Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body >
+	<script>
+	//$(document).ready( init() );
+	Puzzles = function ($) {
+		 	this.nextpuzzle = 0;	
+			this.puzzlelist = [];
+			this.answered = "";
+		};
+	
+	
+	var App = App || {};
+	App = function() {
+		this.Puzzles = new Puzzles();
+		return this;
+	}();
+	//myapp = new App();
+	
+
+	App.Puzzles.getnextpuzzle = function(){
+		return this.nextpuzzle;
+	}
+
+	Puzzles.setPuzzles = function(data) {
+		for (i = 0; i < data.length; i++) {
+			//console.log(data[i].id + ' src-> '+ data[i].src);
+			console.log(typeof data[i]);
+			this.puzzlelist.push(data[i]);
+		};
+	}
+
+	Puzzles.setPuzzle = function(data) {
+		//for (i = 0; i < data.length; i++) {
+			//console.log(data[i].id + ' src-> '+ data[i].src);
+			console.log(typeof data);
+			this.puzzlelist.push(data);
+		//};
+	}
+	Puzzles.loadNextPuzzle = function(){
+		//if(nextpuzzle)
+		var that = this;
+		d = this.puzzlelist[this.nextpuzzle];
+		$('#qus img').attr('src', '../'+d.src);
+		$('.op1').text(d.op1);
+		$('.op2').text(d.op2);
+		$('.op3').text(d.op3);
+		$('.op4').text(d.op4);
+
+		that.answered = '';
+
+		$('#qus .option').attr('href',"#wrongans")
+		$('.'+d.ans).click(function(e,ui){
+			//console.log("test ad fadfa sdafjasd fa sf lasdjflasdjf asdf");
+			that.answered = d.ans;
+		});
+		$('#qus .'+d.ans).attr('href', '#rightans')
+		$('#qus .option').click(function(){
+			App.Puzzles.init();
+			setTimeout(function (e) {
+				$.mobile.pageContainer.pagecontainer("change", "#qus", {
+					transition: "pop"
+				});
+			},3000);	
+		});
+
+		this.nextpuzzle = this.nextpuzzle +1;
+		
+	};
+
+	App.Puzzles.init = function() {
+		//this.surl =  'http://localhost/mywebs/Car-Logo-Game2/GetPuzzles.php?' ; // this is a server url which can be given from US right now. should  be removed later.
+		//$('.receiveddata').text('loading data from'+this.surl);
+		var that = this; // to be used by inner function.
+		console.log('calling to get data.');
+		$.get(
+			"../GetNextPuzzle.php",
+			//this.syrl,
+			{ User: "test", Lavel: 'Easy', LastPuzzleId: that.nextpuzzle },
+			function (data) {
+				//console.log('data received '+data);
+				console.log('received data.');
+
+				var d = $.parseJSON(data);
+				that.setPuzzle(d);
+				that.loadNextPuzzle();
+			});
+		return this;
+	};
+
+	$(document).delegate("#qus",
+		"pagecreate", function(){
+			//console.log('answered a question.');
+			App.Puzzles.init();
+			
+	});
+
+	$(document).one("pagecreate",function(){
+  		//alert("pagebeforeload event fired!");
+	});
+
+	// Bind to the navigate event
+	$( window ).on( "navigate", function() {
+		console.log( "navigated!" );
+
+	});
+
+
+// Testing for receving data from server on click of the getdata button.
+$(document).ready( function() {
+	$('.getdata').click(function(){
+		//console.log('starting to get data');
+		var surl =  $('.serverurl').val()+'test.php' ;
+
+		$('.receiveddata').text('loading data from'+surl);
+
+		$.get(
+			//"../test.php?test=123&test2=124&dsf=2321",
+			surl,
+			{ User: "test", Lavel: 'Easy' },
+			function (data) {
+					console.log('data received '+data);
+					$('.receiveddata').text(data);
+
+		});
+	});
+});
+
+jQuery( "#qus" ).on( "pagecontainerbeforeload", function( event ) { 
+	console.log('locading pane ');
+});
+
+
+$( document ).on( "pagecontainerbeforechange", function ( event, data ) {
+   	console.log('test This is pagecontainerbeforechange');
+});
+	</script>
+
+<!-- Start of first page -->
+<div data-role="page" id="start">
+
+	<div data-role="header">
+		<h1>Wellcome</h1>
+	</div><!-- /header -->
+
+	
+
+	<a href="#qus" data-transition="slide" data-role="button"><img href="#qus" src="start-button.jpg" align:center width:100%; height:100%;/></a>
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<!-- Start of second page -->
+<div data-role="page" id="qus" data-theme="b">
+
+	<div data-role="header">
+		<h1>Question</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content" data-theme="b">	
+		<img src="BMW.png" align:center width:100%; height:100%;/>
+
+	<a href="#discription1" data-transition="flip" data-role="button" class="op1 option">op1</a>
+	<a href="#discription1" data-transition="pop" data-role="button" class="op2 option">op2</a>
+	<a href="#discription1" data-transition="pop" data-role="button" class="op3 option">op3</a>
+	<a href="#discription1" data-transition="pop" data-role="button" class="op4 option">op4</a>
+	</div><!-- /content -->
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of third page Discription of the qus -->
+<div data-role="page" data-theme="b" id="discription">
+
+	<div data-role="header" >
+		<h1>discription</h1>
+	</div><!-- /header -->
+
+	<a href="#qus" data-transition="flip" data-role="button" class="backtoqus">Back</a>
+	<a href="#testToGet" data-transition="flip" data-role="button" class="testtoget">Next</a>
+
+	<div data-role="footer">
+		<h4>Next</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<!-- Start of third page Discription of the qus -->
+<div data-role="page" data-theme="b" id="testToGet">
+
+	<div data-role="header" >
+		<h1>Test to Get data from server</h1>
+	</div><!-- /header -->
+
+	<label for="textinput-2">server address:</label>
+	<input type="text" name="textinput-2" id="textinput-2" class="serverurl" placeholder="Text input" value="">
+	<a href="" data-transition="flip" data-role="button" class="getdata">Get Data</a>
+	
+	<a href="" data-transition="flip" data-role="input" class="receiveddata"> text </a>
+	
+	<a href="#qus" data-transition="flip" data-role="button" class="back">Get Data</a>
+	<div data-role="footer">
+		<h4>Next</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of third page Discription of the qus -->
+<div data-role="page" data-theme="b" id="rightans">
+
+	<div data-role="header" >
+		<h1>discription</h1>
+	</div><!-- /header -->
+	
+	<p back-ground="green" > Congratulations this is correct answer.</a>
+	<a href="#qus" data-transition="flip" data-role="button" class="testtoget">Next</a>
+
+	<div data-role="footer">
+		<h4>Next</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of third page Discription of the qus -->
+<div data-role="page" data-theme="b" id="wrongans">
+
+	<div data-role="header" >
+		<h1>discription</h1>
+	</div><!-- /header -->
+	
+	<p back-ground="green" > Sorry this is incorrect answer.</a>
+	<a href="#qus" data-transition="flip" data-role="button" class="testtoget">Next</a>
+
+	<div data-role="footer">
+		<h4>Next</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+</body>
+</html>

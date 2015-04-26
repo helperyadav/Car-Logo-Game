@@ -16,7 +16,7 @@ switch($_SERVER['REQUEST_METHOD'])
 		$the_request = &$_GET; 
 		 syslog(LOG_WARNING, "Unauthorized client");
 		 
-		echo json_encode(GetPuzzleProvider(1)->GetPuzzles());
+		echo json_encode(GetPuzzleProvider(1)->GetPuzzle($_GET['LastPuzzleId']));
 
 		break;
 	case 'POST': 
