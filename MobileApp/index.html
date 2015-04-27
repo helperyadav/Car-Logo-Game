@@ -22,8 +22,7 @@
 		this.Puzzles = new Puzzles();
 		return this;
 	}();
-	//myapp = new App();
-	
+
 
 	App.Puzzles.getnextpuzzle = function(){
 		return this.nextpuzzle;
@@ -57,18 +56,18 @@
 		that.answered = '';
 
 		$('#qus .option').attr('href',"#wrongans")
-		$('.'+d.ans).click(function(e,ui){
+		$('.'+d.ans).unbind().click(function(e,ui){
 			//console.log("test ad fadfa sdafjasd fa sf lasdjflasdjf asdf");
 			that.answered = d.ans;
 		});
 		$('#qus .'+d.ans).attr('href', '#rightans')
-		$('#qus .option').click(function(){
+		$('#qus .option').unbind().click(function(){
 			App.Puzzles.init();
 			setTimeout(function (e) {
 				$.mobile.pageContainer.pagecontainer("change", "#qus", {
 					transition: "pop"
 				});
-			},3000);	
+			},2000);	
 		});
 
 		this.nextpuzzle = this.nextpuzzle +1;
